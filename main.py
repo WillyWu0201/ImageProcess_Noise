@@ -95,20 +95,49 @@ def adaptiveMedianFilter(image, x, y, size=3, sizeMax=7):
         return zMed
 
 
+def otherAdaptiveMedianFilter(image, x, y, size=3, sizeMax=7):
+    zMax, zMed, zMin, zXY = getGrayLevelValue(image, x, y, size)
+    # LevelA
+    a1 = int(zMed) - int(zMin)
+    a2 = int(zMed) - int(zMax)
+    if a1 > 0 and a2 < 0:
+        # if zMin < zMed < zMax:
+        # Level B
+        b1 = int(zXY) - int(zMin)
+        b2 = int(zXY) - int(zMax)
+        if b1 > 0 and b2 < 0:
+            # if zMin < zXY < zMax:
+            return zXY
+        else:
+            return zMed
+    else:
+        newSize = size + 2
+
+    if newSize <= sizeMax:
+        # repeat LevelA
+        return adaptiveMedianFilter(image, x, y, newSize)
+    else:
+        return zXY
+
+
 # 過濾雜訊
 def filterNoise(image):
     height = image.shape[0]
     width = image.shape[1]
     # height, width, _ = source.shape
     newImage = np.zeros((height, width, 3), np.uint8)
+    # otherImage = np.zeros((height, width, 3), np.uint8)
     for x in range(width):
         for y in range(height):
             pixel = adaptiveMedianFilter(image, x, y)
             newImage[y][x] = pixel
+            # otherPixel = otherAdaptiveMedianFilter(image, x ,y)
+            # otherImage[y][x] = otherPixel
     savePhoto('filterNoise_Image', newImage)
+    # savePhoto('filterNoise_Image_other', otherPixel)
 
 
-grayImage = readGrayImage('lena_color.png')
+grayImage = readGrayImage('source.jpg')
 # grayImage = readGrayImage('source.jpg')
 noiseImage = addNoiseWithPercent(grayImage, 5)
 filterNoise(noiseImage)
