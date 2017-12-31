@@ -92,7 +92,7 @@ def adaptiveMedianFilter(image, x, y, size=3, sizeMax=7):
         # repeat LevelA
         return adaptiveMedianFilter(image, x, y, newSize)
     else:
-        return zMed
+        return zXY
 
 
 def otherAdaptiveMedianFilter(image, x, y, size=3, sizeMax=7):
